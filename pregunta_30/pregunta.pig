@@ -34,3 +34,26 @@ $ pig -x local -f pregunta.pig
         >>> Escriba su respuesta a partir de este punto <<<
 */
 
+data = LOAD 'data.csv' USING PigStorage(',') AS (
+        num_1:int,
+        first_name:chararray,
+        last_name:chararray,
+        date:chararray,
+        color:chararray,
+        num_2:int);
+
+format_date = FOREACH data GENERATE date, 
+                ToString(ToDate(date, 'yyyy-MM-dd'), 'dd') AS day, 
+                ToString(ToDate(date, 'yyyy-MM-dd'), 'd') AS day_s,
+                LOWER(ToString(ToDate(date, 'yyyy-MM-dd'), 'EEEE')) AS day_name;
+                
+replace_month =FOREACH format_date GENERATE date,
+                day,
+                day_s,
+                REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(day_name, 'sunday', 'domingo'), 'monday', 'lunes'),
+                    'tuesday', 'martes'),'wednesday','miercoles'),'thursday','jueves'),'friday','viernes'),'saturday','sabado') AS name_long;
+                 
+final_format = FOREACH replace_month GENERATE date, day, day_s,
+                SUBSTRING(name_long, 0, 3) AS day_short, name_long;
+
+STORE final_format INTO 'output' USING PigStorage(',');
