@@ -30,7 +30,7 @@ data = LOAD 'data.csv' USING PigStorage(',') AS (
 
 name_color = FOREACH data GENERATE first_name, color;
 
-filtered = FILTER name_color BY color IN ('blue','black');
+filtered = FILTER name_color BY NOT (color  MATCHES '.*b.*');
 
 STORE filtered INTO 'output' USING PigStorage(',');
 

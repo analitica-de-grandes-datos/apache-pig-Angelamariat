@@ -32,4 +32,6 @@ name_color = FOREACH data GENERATE first_name, color;
 
 filtered = FILTER name_color BY color == 'blue' AND first_name MATCHES 'Z.*';
 
-STORE filtered INTO 'output' USING PigStorage(',');
+format = FOREACH filtered GENERATE CONCAT(first_name,' ',color);
+
+STORE format INTO 'output' USING PigStorage(',');
